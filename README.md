@@ -1,3 +1,25 @@
+# Philips Hue Integration
+
+#### Usage of this feature may expose you to flashing lights/patterns. Please be mindful if you are prone to seizures.
+
+Syncs light groups in-game to physical lights in the room via smart bulbs.
+Please note light syncing will only work on maps that use Chroma.
+Custom Left/Right colors set in info.dat are not (yet) supported.
+
+## How to install:
+* Download the latest release.
+* Extract the contents of the file to the appropriate directories in the game files.
+
+## How to use:
+* Make sure your Philips Hue system has an entertainment group set up.
+* Go to the Chroma tab in the mod settings in-game.
+* Press the button on the bridge, then press the sync button in the game.
+* Hit OK and go back to the mod settings.
+* Go to the Hue tab and configure your setup.
+* Enjoy!
+
+Please note that you will need the [Q42.HueApi library](https://github.com/Q42/Q42.HueApi) to compile this mod. Please download and build the library before compiling.
+
 # Chroma
 
 Colors!
@@ -72,8 +94,7 @@ Example of _customData:
     * Can only be applied to ring rotation events.
     * `"_nameFilter"`: (string) Causes event to only affect rings with a listed name (e.g. SmallTrackLaneRings, BigTrackLaneRings).
     * `"_reset"`: (bool) Will reset the rings when set to true (Overwrites values below).
-    * `"_rotation"`: (float) Dictates how far the first ring will spin.
-    * `"_step"`: (float) Dictates how much rotation is added between each ring.
+    * `"_step"`: (float) Dictates how far the rings will spin.
     * `"_prop"`: (float) Dictates the rate at which rings behind the first one have physics applied to them.  High value makes all rings move simultaneously, low value gives them [significant delay](https://streamable.com/vsdr9).
     * `"_speed"`: (float) Dictates the [speed multiplier of the rings](https://streamable.com/fxlse).
     * `"_direction"`: (int) Direction to spin the rings (1 spins clockwise, 0 spins counter-clockwise).

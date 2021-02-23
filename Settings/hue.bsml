@@ -1,0 +1,20 @@
+﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+  <settings-container>
+    <bool-setting text='Hue Sync' value='hueenabled' hover-hint='Sync in-game lighting with Philips Hue! (Requires color bulbs with an entertainment setup.)'></bool-setting>
+    <bool-setting text='Low Light' value='lowlight' hover-hint='Prevents lights from turning all the way off during a song.'></bool-setting>
+    <settings-submenu text='&#62; Light Assignments' bold='true' font-size='6'>
+      <settings-container>
+        <horizontal pref-width='90'>
+          <text text='Light Assignments' font-size='6' align='Center'/>
+        </horizontal>
+        <dropdown-list-setting text='Back Lasers' value='blg' options='backlasergroupchoices' formatter='hueblf' hover-hint='Side of the room to sync to in-game light group'></dropdown-list-setting>
+        <dropdown-list-setting text='Rings' value='brg' options='bigringsgroupchoices' formatter='huebrf' hover-hint='Side of the room to sync to in-game light group'></dropdown-list-setting>
+        <dropdown-list-setting text='Left Lasers' value='lrlg' options='leftrotatinglasergroupchoices' formatter='huelrlf' hover-hint='Side of the room to sync to in-game light group'></dropdown-list-setting>
+        <dropdown-list-setting text='Right Lasers' value='rrlg' options='rightrotatinglasergroupchoices' formatter='huerrlf' hover-hint='Side of the room to sync to in-game light group'></dropdown-list-setting>
+        <dropdown-list-setting text='Center Lights' value='clg' options='centerlightgroupchoices' formatter='huecf' hover-hint='Side of the room to sync to in-game light group'></dropdown-list-setting>
+
+        <clickable-text text='&#60; Back' align='Left' click-event='back' />
+      </settings-container>
+    </settings-submenu>
+  </settings-container>
+</bg>

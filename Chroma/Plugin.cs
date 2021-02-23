@@ -2,6 +2,7 @@
 {
     using System.Reflection;
     using BeatSaberMarkupLanguage.GameplaySetup;
+    using BeatSaberMarkupLanguage.Settings;
     using Chroma.Settings;
     using Chroma.Utils;
     using HarmonyLib;
@@ -10,6 +11,61 @@
     using IPA.Config.Stores;
     using UnityEngine.SceneManagement;
     using IPALogger = IPA.Logging.Logger;
+
+    public enum BackLaserGroup
+    {
+        NONE,
+        LEFT,
+        RIGHT,
+        BACK,
+        FRONT,
+        CENTER,
+        ALL,
+    }
+
+    public enum BigRingsGroup
+    {
+        NONE,
+        LEFT,
+        RIGHT,
+        BACK,
+        FRONT,
+        CENTER,
+        ALL,
+    }
+
+    public enum LeftRotatingLaserGroup
+    {
+        NONE,
+        LEFT,
+        RIGHT,
+        BACK,
+        FRONT,
+        CENTER,
+        ALL,
+    }
+
+    public enum RightRotatingLaserGroup
+    {
+        NONE,
+        LEFT,
+        RIGHT,
+        BACK,
+        FRONT,
+        CENTER,
+        ALL,
+    }
+
+    public enum CenterLightGroup
+    {
+        NONE,
+        LEFT,
+        RIGHT,
+        BACK,
+        FRONT,
+        CENTER,
+        ALL,
+    }
 
     [Plugin(RuntimeOptions.DynamicInit)]
     internal class Plugin
@@ -41,19 +97,20 @@
         internal const string STARTCOLOR = "_startColor";
         internal const string STEP = "_step";
         internal const string STEPMULT = "_stepMult";
-        internal const string ROTATION = "_rotation";
 
         internal static readonly Harmony _harmonyInstanceCore = new Harmony(HARMONYIDCORE);
         internal static readonly Harmony _harmonyInstance = new Harmony(HARMONYID);
 
         internal static bool NoodleExtensionsInstalled { get; private set; } = false;
+        private static HueManager hueManager = null;
+
 
         [Init]
         public void Init(IPALogger pluginLogger, Config conf)
         {
             ChromaLogger.IPAlogger = pluginLogger;
             ChromaConfig.Instance = conf.Generated<ChromaConfig>();
-            ChromaController.InitChromaPatches();
+            ChromaController.InitChromaPatches();   
         }
 
         [OnEnable]
@@ -70,6 +127,7 @@
             ChromaUtils.SetSongCoreCapability(REQUIREMENTNAME, ChromaConfig.Instance.CustomColorEventsEnabled);
 
             SceneManager.activeSceneChanged += ChromaController.OnActiveSceneChanged;
+            SceneManager.activeSceneChanged += OnPlugActiveSceneChanged;
 
             // Legacy support
             ChromaUtils.SetSongCoreCapability("Chroma Lighting Events");
@@ -99,6 +157,22 @@
 
             // Legacy support
             ChromaUtils.SetSongCoreCapability("Chroma Lighting Events", false);
+        }
+        public void OnPlugActiveSceneChanged(Scene prevScene, Scene scene)
+        {
+            if (scene.name == "MenuViewControllers" && prevScene.name == "EmptyTransition")
+            {
+                hueManager = new HueManager();
+                if (hueManager.Ready == true)
+                {
+                    BSMLSettings.instance.AddSettingsMenu("Hue", "Chroma.Settings.hue.bsml", ChromaSettingsUI.instance);
+                    BSMLSettings.instance.RemoveSettingsMenu(ChromaHueConnectUI.instance);
+                }
+                else
+                {
+                    BSMLSettings.instance.AddSettingsMenu("Chroma", "Chroma.Settings.settings.bsml", ChromaHueConnectUI.instance);
+                }
+            }
         }
     }
 }

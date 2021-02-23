@@ -194,9 +194,9 @@
                 LegacyLightHelper.Activate(beatmapData.beatmapEventsData);
             }
         }
-
+        private static System.Threading.CancellationTokenSource hueCts = new System.Threading.CancellationTokenSource();
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
-        internal static void OnActiveSceneChanged(Scene current, Scene _)
+        internal static void OnActiveSceneChanged(Scene prevScene, Scene current)
 #pragma warning restore SA1313 // Parameter names should begin with lower-case letter
         {
             if (current.name == "GameCore")
@@ -207,6 +207,18 @@
                 NoteColorizer.ClearCNVColorManagers();
                 SaberColorizer.ClearBSMColorManagers();
             }
+            if (current.name == "MenuViewControllers" && ChromaConfig.Instance.HueEnabled == true)
+            {
+                HueManager.Disconnect(LightInfo.client);
+            }
+            Debug.Log(current.name);
+            if (current.name == "EmptyTransition" && prevScene.name == "MenuViewControllers" && ChromaConfig.Instance.HueEnabled == true)
+            {
+                hueCts.Cancel();
+                hueCts = new System.Threading.CancellationTokenSource();
+                HueManager.connect(hueCts.Token);
+            }
+            
         }
     }
 }

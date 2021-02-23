@@ -114,6 +114,10 @@
             {
                 monobehaviour.Reset();
             }
+            if (Settings.ChromaConfig.Instance.HueEnabled == true)
+            {
+                HueManager.ProcessEvent(beatmapEventData, color);
+            }
         }
 
         private static void SetOverrideLightWithIds(params ILightWithId[] lights)

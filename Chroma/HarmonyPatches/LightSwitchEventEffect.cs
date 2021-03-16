@@ -1,6 +1,8 @@
 ﻿namespace Chroma.HarmonyPatches
 {
     using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
     using Chroma.Colorizer;
     using HarmonyLib;
     using UnityEngine;
@@ -9,9 +11,7 @@
     [HarmonyPatch("Start")]
     internal static class LightSwitchEventEffectStart
     {
-#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
         private static void Postfix(LightSwitchEventEffect __instance, BeatmapEventType ____event)
-#pragma warning restore SA1313 // Parameter names should begin with lower-case letter
         {
             __instance.StartCoroutine(WaitThenStart(__instance, ____event));
         }
@@ -27,15 +27,36 @@
     [ChromaPatch("SetColor")]
     internal static class LightSwitchEventEffectSetColor
     {
-        private static bool Prefix(Color color)
+        private static bool Prefix(LightSwitchEventEffect __instance, BeatmapEventType ____event, Color color)
         {
-            if (LightSwitchEventEffectHandleBeatmapObjectCallbackControllerBeatmapEventDidTrigger.OverrideLightWithIdActivation != null)
+            if (LightColorManager.LightIDOverride != null)
             {
-                ILightWithId[] lights = LightSwitchEventEffectHandleBeatmapObjectCallbackControllerBeatmapEventDidTrigger.OverrideLightWithIdActivation;
+                List<ILightWithId> lights = __instance.GetLights();
+                int type = (int)____event;
+                IEnumerable<int> newIds = LightColorManager.LightIDOverride.Select(n => LightIDTableManager.GetActiveTableValue(type, n) ?? n);
+                foreach (int id in newIds)
+                {
+                    if (lights[id].isRegistered)
+                    {
+                        lights[id].ColorWasSet(color);
+                    }
+                }
+
+                LightColorManager.LightIDOverride = null;
+
+                return false;
+            }
+
+            // Legacy Prop Id stuff
+            if (LightSwitchEventEffectHandleBeatmapObjectCallbackControllerBeatmapEventDidTrigger.LegacyLightOverride != null)
+            {
+                ILightWithId[] lights = LightSwitchEventEffectHandleBeatmapObjectCallbackControllerBeatmapEventDidTrigger.LegacyLightOverride;
                 for (int i = 0; i < lights.Length; i++)
                 {
                     lights[i].ColorWasSet(color);
                 }
+
+                LightSwitchEventEffectHandleBeatmapObjectCallbackControllerBeatmapEventDidTrigger.LegacyLightOverride = null;
 
                 return false;
             }
@@ -48,25 +69,18 @@
     [ChromaPatch("HandleBeatmapObjectCallbackControllerBeatmapEventDidTrigger")]
     internal static class LightSwitchEventEffectHandleBeatmapObjectCallbackControllerBeatmapEventDidTrigger
     {
-        internal static ILightWithId[] OverrideLightWithIdActivation { get; set; }
+        internal static ILightWithId[] LegacyLightOverride { get; set; }
 
         // 0 = off
         // 1 = blue on, 5 = red on
         // 2 = blue flash, 6 = red flash
         // 3 = blue fade, 7 = red fade
-#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
         private static void Prefix(LightSwitchEventEffect __instance, BeatmapEventData beatmapEventData, BeatmapEventType ____event)
-#pragma warning restore SA1313 // Parameter names should begin with lower-case letter
         {
             if (beatmapEventData.type == ____event)
             {
                 LightColorManager.ColorLightSwitch(__instance, beatmapEventData);
             }
-        }
-
-        private static void Postfix()
-        {
-            OverrideLightWithIdActivation = null;
         }
     }
 }

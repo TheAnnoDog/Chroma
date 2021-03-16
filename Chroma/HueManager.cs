@@ -57,6 +57,7 @@ namespace Chroma
                 Debug.Log("Something went wrong!");
                 throw;
             }
+            
         }
         public static async Task connect(CancellationToken token, string ip = null)
         {
@@ -72,7 +73,7 @@ namespace Chroma
             var client = new StreamingHueClient(ip, appKey, clientKey);
             token.ThrowIfCancellationRequested();
             Debug.Log("Connected! Getting entertainment group...");
-            var group = (await client.LocalHueClient.GetEntertainmentGroups()).ElementAtOrDefault(0);
+            var group = (await client.LocalHueClient.GetEntertainmentGroups()).FirstOrDefault();
             if (group == null)
             {
                 Debug.Log("Group is missing!");

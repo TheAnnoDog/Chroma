@@ -1,9 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{6F47BF06-51D9-4349-9B2C-C0F963BE896A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -11,46 +12,54 @@
     <AssemblyName>Chroma</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugType>portable</DebugType>
+    <LocalRefsDir Condition="Exists('..\Refs')">..\Refs</LocalRefsDir>
+    <BeatSaberDir>$(LocalRefsDir)</BeatSaberDir>
+    <AppOutputBase>$(MSBuildProjectDirectory)\</AppOutputBase>
+    <!--<PathMap>$(AppOutputBase)=X:\$(AssemblyName)\</PathMap>-->
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
     <CodeAnalysisRuleSet>..\..\NoodleExtensions\NoodleExtensions\NoodleExtensions.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
     <CodeAnalysisRuleSet>..\..\NoodleExtensions\NoodleExtensions\NoodleExtensions.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(DefineConstants.Contains('CIBuild')) OR '$(NCrunch)' == '1'">
+    <DisableCopyToPlugins>True</DisableCopyToPlugins>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(NCrunch)' == '1'">
+    <DisableCopyToPlugins>True</DisableCopyToPlugins>
+    <DisableZipRelease>True</DisableZipRelease>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AnimationHelper.cs" />
     <Compile Include="ChromaPatch.cs" />
     <Compile Include="ChromaRingsRotationEffect.cs" />
+    <Compile Include="HueManager.cs" />
+    <Compile Include="LightIDTableManager.cs" />
     <Compile Include="Colorizer\BombColorizer.cs" />
     <Compile Include="Colorizer\SaberColorizer.cs" />
     <Compile Include="Colorizer\NoteColorizer.cs" />
     <Compile Include="Colorizer\ObstacleColorizer.cs" />
     <Compile Include="HarmonyPatches\BeatmapObjectSpawnController.cs" />
     <Compile Include="HarmonyPatches\BombNoteController.cs" />
-    <Compile Include="HarmonyPatches\Saber.cs" />
+    <Compile Include="HarmonyPatches\SaberManager.cs" />
     <Compile Include="HarmonyPatches\LightRotationEventEffect.cs" />
+    <Compile Include="HarmonyPatches\SaberBurnMarkArea.cs" />
     <Compile Include="HarmonyPatches\ScenesTransition\MissionLevelScenesTransitionSetupDataSO.cs" />
     <Compile Include="HarmonyPatches\ScenesTransition\SceneTransitionHelper.cs" />
     <Compile Include="HarmonyPatches\ScenesTransition\MultiplayerLevelScenesTransitionSetupDataSO.cs" />
     <Compile Include="HarmonyPatches\TrackLaneRingsRotationEffect.cs" />
-    <Compile Include="HueManager.cs" />
     <Compile Include="LegacyLightHelper.cs" />
     <Compile Include="HarmonyPatches\BeatEffectSpawner.cs" />
     <Compile Include="HarmonyPatches\ScenesTransition\StandardLevelScenesTransitionSetupDataSO.cs" />
@@ -80,10 +89,41 @@
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />
     <EmbeddedResource Include="Settings\modifiers.bsml" />
-    <EmbeddedResource Include="Settings\lightshow.bsml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\LightshowIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Directory.Build.props" Condition="Exists('Directory.Build.props')" />
+    <None Include="Directory.Build.targets" Condition="Exists('Directory.Build.targets')" />
+    <None Include="Chroma.csproj.user" Condition="Exists('Chroma.csproj.user')" />
+    <EmbeddedResource Include="LightIDTables\BigMirrorEnvironment.json" />
+    <EmbeddedResource Include="LightIDTables\BTSEnvironment.json" />
+    <EmbeddedResource Include="LightIDTables\CrabRaveEnvironment.json" />
+    <EmbeddedResource Include="LightIDTables\DefaultEnvironment.json" />
+    <EmbeddedResource Include="LightIDTables\DragonsEnvironment.json" />
+    <EmbeddedResource Include="LightIDTables\FitBeatEnvironment.json" />
+    <EmbeddedResource Include="LightIDTables\GlassDesertEnvironment.json" />
+    <EmbeddedResource Include="LightIDTables\GreenDayEnvironment.json" />
+    <EmbeddedResource Include="LightIDTables\GreenDayGrenadeEnvironment.json" />
+    <EmbeddedResource Include="LightIDTables\KDAEnvironment.json" />
+    <EmbeddedResource Include="LightIDTables\LinkinParkEnvironment.json" />
+    <EmbeddedResource Include="LightIDTables\MonstercatEnvironment.json" />
+    <EmbeddedResource Include="LightIDTables\NiceEnvironment.json" />
+    <EmbeddedResource Include="LightIDTables\OriginsEnvironment.json" />
+    <EmbeddedResource Include="LightIDTables\PanicEnvironment.json" />
+    <EmbeddedResource Include="LightIDTables\RocketEnvironment.json" />
+    <EmbeddedResource Include="LightIDTables\TimbalandEnvironment.json" />
+    <EmbeddedResource Include="LightIDTables\TriangleEnvironment.json" />
+    <EmbeddedResource Include="Settings\hue.bsml" />
+    <EmbeddedResource Include="Settings\settings.bsml" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="BeatSaberModdingTools.Tasks">
+      <Version>1.3.2</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
@@ -92,55 +132,45 @@
     <Reference Include="BeatmapCore">
       <HintPath>D:\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\BeatmapCore.dll</HintPath>
     </Reference>
-    <Reference Include="BSML, Version=1.1.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="BSML">
       <HintPath>D:\Steam\steamapps\common\Beat Saber\Plugins\BSML.dll</HintPath>
-    </Reference>
-    <Reference Include="BS_Utils, Version=1.4.8.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>D:\Steam\steamapps\common\Beat Saber\Plugins\BS_Utils.dll</HintPath>
     </Reference>
     <Reference Include="Colors">
       <HintPath>D:\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\Colors.dll</HintPath>
     </Reference>
-    <Reference Include="CustomJSONData, Version=0.0.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="CustomJSONData">
       <HintPath>D:\Steam\steamapps\common\Beat Saber\Plugins\CustomJSONData.dll</HintPath>
     </Reference>
     <Reference Include="GameplayCore">
       <HintPath>D:\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\GameplayCore.dll</HintPath>
     </Reference>
-    <Reference Include="HMLib, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="HMLib">
       <HintPath>D:\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\HMLib.dll</HintPath>
     </Reference>
-    <Reference Include="HMRendering, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="HMRendering">
       <HintPath>D:\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\HMRendering.dll</HintPath>
     </Reference>
-    <Reference Include="HMUI, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>D:\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\HMUI.dll</HintPath>
-    </Reference>
-    <Reference Include="IPA.Loader, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="IPA.Loader">
       <HintPath>D:\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\IPA.Loader.dll</HintPath>
     </Reference>
     <Reference Include="Main">
       <HintPath>D:\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\Main.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>D:\Steam\steamapps\common\Beat Saber\Libs\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="NoodleExtensions">
       <HintPath>D:\Steam\steamapps\common\Beat Saber\Plugins\NoodleExtensions.dll</HintPath>
     </Reference>
     <Reference Include="Q42.HueApi">
-      <HintPath>Q42.HueApi\src\Q42.HueApi.Streaming\bin\Debug\net472\Q42.HueApi.dll</HintPath>
+      <HintPath>D:\Steam\steamapps\common\Beat Saber\Libs\Q42.HueApi.dll</HintPath>
     </Reference>
     <Reference Include="Q42.HueApi.ColorConverters">
-      <HintPath>Q42.HueApi\src\Q42.HueApi.Streaming\bin\Debug\net472\Q42.HueApi.ColorConverters.dll</HintPath>
+      <HintPath>D:\Steam\steamapps\common\Beat Saber\Libs\Q42.HueApi.ColorConverters.dll</HintPath>
     </Reference>
     <Reference Include="Q42.HueApi.Streaming">
-      <HintPath>Q42.HueApi\src\Q42.HueApi.Streaming\bin\Debug\net472\Q42.HueApi.Streaming.dll</HintPath>
+      <HintPath>D:\Steam\steamapps\common\Beat Saber\Libs\Q42.HueApi.Streaming.dll</HintPath>
     </Reference>
     <Reference Include="SiraUtil">
       <HintPath>D:\Steam\steamapps\common\Beat Saber\Plugins\SiraUtil.dll</HintPath>
@@ -153,14 +183,5 @@
       <HintPath>D:\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Settings\settings.bsml" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Settings\hue.bsml" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetDir)$(TargetName).dll" "C:\Program Files (x86)\Steam\steamapps\common\Beat Saber\Plugins\$(TargetName).dll"</PostBuildEvent>
-  </PropertyGroup>
 </Project>

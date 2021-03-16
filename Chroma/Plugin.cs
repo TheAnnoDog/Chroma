@@ -97,6 +97,7 @@
         internal const string STARTCOLOR = "_startColor";
         internal const string STEP = "_step";
         internal const string STEPMULT = "_stepMult";
+        internal const string ROTATION = "_rotation";
 
         internal static readonly Harmony _harmonyInstanceCore = new Harmony(HARMONYIDCORE);
         internal static readonly Harmony _harmonyInstance = new Harmony(HARMONYID);
@@ -104,13 +105,13 @@
         internal static bool NoodleExtensionsInstalled { get; private set; } = false;
         private static HueManager hueManager = null;
 
-
         [Init]
         public void Init(IPALogger pluginLogger, Config conf)
         {
             ChromaLogger.IPAlogger = pluginLogger;
             ChromaConfig.Instance = conf.Generated<ChromaConfig>();
-            ChromaController.InitChromaPatches();   
+            ChromaController.InitChromaPatches();
+            LightIDTableManager.InitTable();
         }
 
         [OnEnable]
@@ -119,10 +120,6 @@
             _harmonyInstanceCore.PatchAll(Assembly.GetExecutingAssembly());
 
             GameplaySetup.instance.AddTab("Chroma", "Chroma.Settings.modifiers.bsml", ChromaSettingsUI.instance);
-            if (ChromaConfig.Instance.LightshowMenu)
-            {
-                GameplaySetup.instance.AddTab("Lightshow Modifiers", "Chroma.Settings.lightshow.bsml", ChromaSettingsUI.instance);
-            }
 
             ChromaUtils.SetSongCoreCapability(REQUIREMENTNAME, ChromaConfig.Instance.CustomColorEventsEnabled);
 

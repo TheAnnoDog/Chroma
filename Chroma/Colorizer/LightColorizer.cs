@@ -69,9 +69,9 @@
             LSEColorManager.GetLSEColorManager(lse)?.SetLastValue(value);
         }
 
-        internal static ILightWithId[] GetLights(this LightSwitchEventEffect lse)
+        internal static List<ILightWithId> GetLights(this LightSwitchEventEffect lse)
         {
-            return LSEColorManager.GetLSEColorManager(lse)?.Lights.ToArray();
+            return LSEColorManager.GetLSEColorManager(lse)?.Lights;
         }
 
         internal static ILightWithId[][] GetLightsPropagationGrouped(this LightSwitchEventEffect lse)
@@ -136,11 +136,23 @@
 
                     Lights = lse.GetField<LightWithIdManager, LightSwitchEventEffect>("_lightManager").GetField<List<ILightWithId>[], LightWithIdManager>("_lights")[lse.lightsId];
                     IDictionary<int, List<ILightWithId>> lightsPreGroup = new Dictionary<int, List<ILightWithId>>();
+                    TrackLaneRingsManager[] managers = Object.FindObjectsOfType<TrackLaneRingsManager>();
                     foreach (ILightWithId light in Lights)
                     {
                         if (light is MonoBehaviour monoBehaviour)
                         {
                             int z = Mathf.RoundToInt(monoBehaviour.transform.position.z);
+
+                            TrackLaneRing ring = monoBehaviour.GetComponentInParent<TrackLaneRing>();
+                            if (ring != null)
+                            {
+                                TrackLaneRingsManager mngr = managers.FirstOrDefault(it => it.Rings.IndexOf(ring) >= 0);
+                                if (mngr != null)
+                                {
+                                    z = 1000 + mngr.Rings.IndexOf(ring);
+                                }
+                            }
+
                             if (lightsPreGroup.TryGetValue(z, out List<ILightWithId> list))
                             {
                                 list.Add(light);

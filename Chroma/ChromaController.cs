@@ -186,7 +186,6 @@
             {
                 HueManager.Disconnect(LightInfo.client);
             }
-            Debug.Log(current.name);
             if (current.name == "EmptyTransition" && prevScene.name == "MenuViewControllers" && ChromaConfig.Instance.HueEnabled == true)
             {
                 hueCts.Cancel();

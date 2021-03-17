@@ -205,7 +205,9 @@
             internal void Reset()
             {
                 _lightColor0.SetColor(_lightColor0_Original);
+                HueManager.setOrigRight(_lightColor0_Original);
                 _lightColor1.SetColor(_lightColor1_Original);
+                HueManager.setOrigLeft(_lightColor1_Original);
                 if (_supportBoostColor)
                 {
                     _lightColor0Boost.SetColor(_lightColor0Boost_Original);

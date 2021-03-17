@@ -21,6 +21,8 @@ namespace Chroma
 {
     class HueManager
     {
+        static Color origLeft = new Color(1, 0, 0);
+        static Color origRight = new Color(0, 0, 1);
         CustomBeatmapData customBeatmapData;
         public bool Ready => Settings.ChromaConfig.Instance.HueAppKey != "none" && Settings.ChromaConfig.Instance.HueClientKey != "none";
         private static async Task<string> FindBridge()
@@ -97,6 +99,8 @@ namespace Chroma
             {
                 client.Close();
                 LightInfo.disconnect();
+                origLeft = new Color(1, 0, 0);
+                origRight = new Color(0, 0, 1);
                 Debug.Log("Disconnected");
             }
         }
@@ -111,16 +115,230 @@ namespace Chroma
             
         }
 
+        public static void setOrigLeft(Color color)
+        {
+            origLeft = color;
+        }
 
-        public static async Task ProcessEvent(BeatmapEventData data, Color? raw = null)
+        public static void setOrigRight(Color color)
+        {
+            origRight = color;
+        }
+
+        public static async Task SendCommandL(BeatmapEventData data, HSB hsbColor, double brightness, HSB inithsbColor, HSB endhsbColor, double time, bool gradient)
         {
             CancellationToken token = LightInfo.token;
             EntertainmentLayer entLayer = LightInfo.layer;
+            if (gradient == true)
+            {
+                switch (data.value)
+                {
+                    case 0: entLayer.GetLeft().SetState(token, null, brightness); break;
+                    case 1: entLayer.GetLeft().SetState(token, inithsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, endhsbColor.GetRGB(), 1, TimeSpan.FromSeconds(time)); break;
+                    case 5: entLayer.GetLeft().SetState(token, inithsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, endhsbColor.GetRGB(), 1, TimeSpan.FromSeconds(time)); break;
+                }
+            }
+            else
+            {
+                switch (data.value)
+                {
+                    case 0: entLayer.GetLeft().SetState(token, null, brightness); break;
+                    case 1: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); break;
+                    case 2: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                    case 3: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                    case 5: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); break;
+                    case 6: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                    case 7: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                }
+            }
+        }
+
+        public static async Task SendCommandR(BeatmapEventData data, HSB hsbColor, double brightness, HSB inithsbColor, HSB endhsbColor, double time, bool gradient)
+        {
+            CancellationToken token = LightInfo.token;
+            EntertainmentLayer entLayer = LightInfo.layer;
+            if (gradient == true)
+            {
+                switch (data.value)
+                {
+                    case 0: entLayer.GetRight().SetState(token, null, brightness); break;
+                    case 1: entLayer.GetRight().SetState(token, inithsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, endhsbColor.GetRGB(), 1, TimeSpan.FromSeconds(time)); break;
+                    case 5: entLayer.GetRight().SetState(token, inithsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, endhsbColor.GetRGB(), 1, TimeSpan.FromSeconds(time)); break;
+                }
+            }
+            else
+            {
+                switch (data.value)
+                {
+                    case 0: entLayer.GetRight().SetState(token, null, brightness); break;
+                    case 1: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); break;
+                    case 2: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                    case 3: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                    case 5: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); break;
+                    case 6: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                    case 7: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                }
+            }
+        }
+
+        public static async Task SendCommandF(BeatmapEventData data, HSB hsbColor, double brightness, HSB inithsbColor, HSB endhsbColor, double time, bool gradient)
+        {
+            CancellationToken token = LightInfo.token;
+            EntertainmentLayer entLayer = LightInfo.layer;
+            if (gradient == true)
+            {
+                switch (data.value)
+                {
+                    case 0: entLayer.GetFront().SetState(token, null, brightness); break;
+                    case 1: entLayer.GetFront().SetState(token, inithsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, endhsbColor.GetRGB(), 1, TimeSpan.FromSeconds(time)); break;
+                    case 5: entLayer.GetFront().SetState(token, inithsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, endhsbColor.GetRGB(), 1, TimeSpan.FromSeconds(time)); break;
+                }
+            }
+            else
+            {
+                switch (data.value)
+                {
+                    case 0: entLayer.GetFront().SetState(token, null, brightness); break;
+                    case 1: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); break;
+                    case 2: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                    case 3: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                    case 5: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); break;
+                    case 6: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                    case 7: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                }
+            }
+        }
+
+        public static async Task SendCommandB(BeatmapEventData data, HSB hsbColor, double brightness, HSB inithsbColor, HSB endhsbColor, double time, bool gradient)
+        {
+            CancellationToken token = LightInfo.token;
+            EntertainmentLayer entLayer = LightInfo.layer;
+            if (gradient == true)
+            {
+                switch (data.value)
+                {
+                    case 0: entLayer.GetBack().SetState(token, null, brightness); break;
+                    case 1: entLayer.GetBack().SetState(token, inithsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, endhsbColor.GetRGB(), 1, TimeSpan.FromSeconds(time)); break;
+                    case 5: entLayer.GetBack().SetState(token, inithsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, endhsbColor.GetRGB(), 1, TimeSpan.FromSeconds(time)); break;
+                }
+            }
+            else
+            {
+                switch (data.value)
+                {
+                    case 0: entLayer.GetBack().SetState(token, null, brightness); break;
+                    case 1: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); break;
+                    case 2: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                    case 3: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                    case 5: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); break;
+                    case 6: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                    case 7: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                }
+            }
+        }
+
+        public static async Task SendCommandC(BeatmapEventData data, HSB hsbColor, double brightness, HSB inithsbColor, HSB endhsbColor, double time, bool gradient)
+        {
+            CancellationToken token = LightInfo.token;
+            EntertainmentLayer entLayer = LightInfo.layer;
+            if (gradient == true)
+            {
+                switch (data.value)
+                {
+                    case 0: entLayer.GetCenter().SetState(token, null, brightness); break;
+                    case 1: entLayer.GetCenter().SetState(token, inithsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, endhsbColor.GetRGB(), 1, TimeSpan.FromSeconds(time)); break;
+                    case 5: entLayer.GetCenter().SetState(token, inithsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, endhsbColor.GetRGB(), 1, TimeSpan.FromSeconds(time)); break;
+                }
+            }
+            else
+            {
+                switch (data.value)
+                {
+                    case 0: entLayer.GetCenter().SetState(token, null, brightness); break;
+                    case 1: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); break;
+                    case 2: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                    case 3: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                    case 5: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); break;
+                    case 6: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                    case 7: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                }
+            }
+        }
+        public static async Task SendCommandA(BeatmapEventData data, HSB hsbColor, double brightness, HSB inithsbColor, HSB endhsbColor, double time, bool gradient)
+        {
+            CancellationToken token = LightInfo.token;
+            EntertainmentLayer entLayer = LightInfo.layer;
+            if (gradient == true)
+            {
+                switch (data.value)
+                {
+                    case 0: entLayer.SetState(token, null, brightness); break;
+                    case 1: entLayer.SetState(token, inithsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, endhsbColor.GetRGB(), 1, TimeSpan.FromSeconds(time)); break;
+                    case 5: entLayer.SetState(token, inithsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, endhsbColor.GetRGB(), 1, TimeSpan.FromSeconds(time)); break;
+                }
+            }
+            else
+            {
+                switch (data.value)
+                {
+                    case 0: entLayer.SetState(token, null, brightness); break;
+                    case 1: entLayer.SetState(token, hsbColor.GetRGB(), 1); break;
+                    case 2: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                    case 3: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                    case 5: entLayer.SetState(token, hsbColor.GetRGB(), 1); break;
+                    case 6: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                    case 7: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
+                }
+            }
+        }
+
+        public static async Task ProcessEvent(BeatmapEventData data, Color? raw = null, dynamic gradientObject = null)
+        {
             double r = 0;
             double g = 0;
             double b = 0;
+            double ir = 0;
+            double ig = 0;
+            double ib = 0;
+            double er = 0;
+            double eg = 0;
+            double eb = 0;
             double brightness;
+            float duration = 0;
+            bool gradient = false;
+            Color initcolor;
+            Color endcolor;
+            var initrgbColor = new RGBColor(ir, ig, ib);
+            var inithsbColor = initrgbColor.GetHSB();
+            var endrgbColor = new RGBColor(er, eg, eb);
+            var endhsbColor = endrgbColor.GetHSB();
 
+            if (gradientObject != null)
+            {
+                duration = (float)Trees.at(gradientObject, DURATION);
+                initcolor = Utils.ChromaUtils.GetColorFromData(gradientObject, STARTCOLOR);
+                endcolor = Utils.ChromaUtils.GetColorFromData(gradientObject, ENDCOLOR);
+                ir = initcolor.r;
+                ig = initcolor.g;
+                ib = initcolor.b;
+                er = endcolor.r;
+                eg = endcolor.g;
+                eb = endcolor.b;
+                initrgbColor = new RGBColor(ir, ig, ib);
+                inithsbColor = initrgbColor.GetHSB();
+                endrgbColor = new RGBColor(er, eg, eb);
+                endhsbColor = endrgbColor.GetHSB();
+                if (Settings.ChromaConfig.Instance.LowLight == true)
+                {
+
+                    if (inithsbColor.Brightness < 127) { inithsbColor.Brightness = 127; }
+                    if (endhsbColor.Brightness < 127) { endhsbColor.Brightness = 127; }
+                }
+                else
+                {
+                }
+                gradient = true;
+            }
             if (raw.HasValue)
             {
                 Color color = (Color)raw;
@@ -130,11 +348,15 @@ namespace Chroma
             }
             else if (data.value == 5 || data.value == 6 || data.value == 7)
             {
-                r = 1;
+                r = origLeft.r;
+                g = origLeft.g;
+                b = origLeft.b;
             }
             else
             {
-                b = 1;
+                r = origRight.r;
+                g = origRight.g;
+                b = origRight.b;
             }
 
             var rgbColor = new RGBColor(r, g, b);
@@ -156,81 +378,27 @@ namespace Chroma
                 { }
                 if (Settings.ChromaConfig.Instance.BackLaserGroup == BackLaserGroup.LEFT)
                 {
-                    switch(data.value)
-                    {
-                        case 0: entLayer.GetLeft().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandL(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.BackLaserGroup == BackLaserGroup.RIGHT)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetRight().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandR(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.BackLaserGroup == BackLaserGroup.FRONT)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetFront().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandF(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.BackLaserGroup == BackLaserGroup.BACK)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetBack().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandB(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.BackLaserGroup == BackLaserGroup.CENTER)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetCenter().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandC(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.BackLaserGroup == BackLaserGroup.ALL)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.SetState(token, null, brightness); break;
-                        case 1: entLayer.SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandA(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
             }
             
@@ -240,81 +408,27 @@ namespace Chroma
                 { }
                 if (Settings.ChromaConfig.Instance.BigRingsGroup == BigRingsGroup.LEFT)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetLeft().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandL(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.BigRingsGroup == BigRingsGroup.RIGHT)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetRight().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandR(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.BigRingsGroup == BigRingsGroup.FRONT)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetFront().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandF(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.BigRingsGroup == BigRingsGroup.BACK)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetBack().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandB(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.BigRingsGroup == BigRingsGroup.CENTER)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetCenter().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandC(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.BigRingsGroup == BigRingsGroup.ALL)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.SetState(token, null, brightness); break;
-                        case 1: entLayer.SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandA(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
             }
             if (data.type == BeatmapEventType.Event2)
@@ -323,81 +437,27 @@ namespace Chroma
                 { }
                 if (Settings.ChromaConfig.Instance.LeftRotatingLaserGroup == LeftRotatingLaserGroup.LEFT)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetLeft().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandL(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.LeftRotatingLaserGroup == LeftRotatingLaserGroup.RIGHT)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetRight().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandR(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.LeftRotatingLaserGroup == LeftRotatingLaserGroup.FRONT)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetFront().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandF(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.LeftRotatingLaserGroup == LeftRotatingLaserGroup.BACK)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetBack().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandB(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.LeftRotatingLaserGroup == LeftRotatingLaserGroup.CENTER)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetCenter().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandC(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.LeftRotatingLaserGroup == LeftRotatingLaserGroup.ALL)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.SetState(token, null, brightness); break;
-                        case 1: entLayer.SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandA(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
             }
             if (data.type == BeatmapEventType.Event3)
@@ -406,81 +466,27 @@ namespace Chroma
                 { }
                 if (Settings.ChromaConfig.Instance.RightRotatingLaserGroup == RightRotatingLaserGroup.LEFT)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetLeft().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandL(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.RightRotatingLaserGroup == RightRotatingLaserGroup.RIGHT)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetRight().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandR(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.RightRotatingLaserGroup == RightRotatingLaserGroup.FRONT)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetFront().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandF(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.RightRotatingLaserGroup == RightRotatingLaserGroup.BACK)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetBack().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandB(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.RightRotatingLaserGroup == RightRotatingLaserGroup.CENTER)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetCenter().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandC(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.RightRotatingLaserGroup == RightRotatingLaserGroup.ALL)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.SetState(token, null, brightness); break;
-                        case 1: entLayer.SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandA(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
             }
             if (data.type == BeatmapEventType.Event4)
@@ -489,81 +495,27 @@ namespace Chroma
                 { }
                 if (Settings.ChromaConfig.Instance.CenterLightGroup == CenterLightGroup.LEFT)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetLeft().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetLeft().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandL(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.CenterLightGroup == CenterLightGroup.RIGHT)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetRight().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetRight().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetRight().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandR(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.CenterLightGroup == CenterLightGroup.FRONT)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetFront().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetFront().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetFront().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandF(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.CenterLightGroup == CenterLightGroup.BACK)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetBack().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetBack().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetBack().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandB(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.CenterLightGroup == CenterLightGroup.CENTER)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.GetCenter().SetState(token, null, brightness); break;
-                        case 1: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.GetCenter().SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandC(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
                 if (Settings.ChromaConfig.Instance.CenterLightGroup == CenterLightGroup.ALL)
                 {
-                    switch (data.value)
-                    {
-                        case 0: entLayer.SetState(token, null, brightness); break;
-                        case 1: entLayer.SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 2: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 3: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 5: entLayer.SetState(token, hsbColor.GetRGB(), 1); break;
-                        case 6: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                        case 7: entLayer.SetState(token, hsbColor.GetRGB(), 1); await Task.Delay(TimeSpan.FromMilliseconds(20), token); entLayer.SetState(token, hsbColor.GetRGB(), brightness, TimeSpan.FromSeconds(1)); break;
-                    }
+                    await SendCommandA(data, hsbColor, brightness, inithsbColor, endhsbColor, duration, gradient);
                 }
             }
         }

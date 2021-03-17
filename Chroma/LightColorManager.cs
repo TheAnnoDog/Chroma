@@ -18,6 +18,7 @@
             monobehaviour.SetLastValue(beatmapEventData.value);
 
             Color? color = null;
+            bool gradi = false;
 
             // legacy was a mistake
             color = LegacyLightHelper.GetLegacyColor(beatmapEventData) ?? color;
@@ -81,6 +82,11 @@
                     if (gradientObject != null)
                     {
                         color = ChromaGradientController.AddGradient(gradientObject, beatmapEventData.type, beatmapEventData.time);
+                        if (Settings.ChromaConfig.Instance.HueEnabled == true)
+                        {
+                            HueManager.ProcessEvent(beatmapEventData, null, gradientObject);
+                        }
+                        gradi = true;
                     }
                 }
 
@@ -89,6 +95,7 @@
                 {
                     color = colorData;
                     ChromaGradientController.CancelGradient(beatmapEventData.type);
+                    gradi = false;
                 }
             }
 
@@ -100,7 +107,7 @@
             {
                 monobehaviour.Reset();
             }
-            if (Settings.ChromaConfig.Instance.HueEnabled == true)
+            if (Settings.ChromaConfig.Instance.HueEnabled == true && gradi == false)
             {
                 HueManager.ProcessEvent(beatmapEventData, color);
             }
